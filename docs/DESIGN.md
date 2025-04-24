@@ -58,14 +58,14 @@ A modern ToDo List application built with React (Next.js) and Supabase that allo
 
 ### Tasks Table
 - id (UUID, PK)
-- user_id (UUID, FK to users.id)
+- userId (UUID, FK to users.id)
 - title (string)
 - description (text, optional)
-- is_completed (boolean)
+- isCompleted (boolean)
 - priority (enum: low, medium, high)
-- due_date (timestamp, optional)
-- created_at (timestamp)
-- updated_at (timestamp)
+- dueDate (timestamp, optional)
+- createdAt (timestamp)
+- updatedAt (timestamp)
 
 ## API Endpoints
 
@@ -73,34 +73,37 @@ Using Supabase client library:
 
 - **Authentication**
   - Sign up: `supabase.auth.signUp()`
-  - Sign in: `supabase.auth.signIn()`
+  - Sign in: `supabase.auth.signInWithPassword()`
   - Sign out: `supabase.auth.signOut()`
 
 - **Tasks**
   - Get all tasks: `supabase.from('tasks').select()`
-  - Get task: `supabase.from('tasks').select().match({ id })`
+  - Get task: `supabase.from('tasks').select().eq('id', id)`
   - Create task: `supabase.from('tasks').insert()`
-  - Update task: `supabase.from('tasks').update().match({ id })`
-  - Delete task: `supabase.from('tasks').delete().match({ id })`
+  - Update task: `supabase.from('tasks').update().eq('id', id)`
+  - Delete task: `supabase.from('tasks').delete().eq('id', id)`
 
 ## UI Components
 
 1. **Layout Components**
-   - Layout (main layout with authentication state)
+   - AppLayout (main layout with authentication state)
    - Navbar (navigation, user info)
-   - Footer
+   - ClientProviders (for client-side state management)
 
 2. **Authentication Components**
    - SignUpForm
    - SignInForm
-   - PasswordResetForm
 
 3. **Task Components**
    - TaskList
    - TaskItem
    - TaskForm
-   - TaskFilter
-   - TaskSearch
+   - TaskIcon (visual representation of task status)
+
+4. **UI Components**
+   - Standard shadcn/ui components (button, dialog, form, etc.)
+   - TodoLogo (application logo component)
+   - Custom UI elements
 
 ## State Management
 
@@ -110,25 +113,30 @@ Using Supabase client library:
 ## Project Structure
 
 ```
-/app
-  /api
-    /tasks/...
-  /(auth)
-    /sign-in/page.tsx
-    /sign-up/page.tsx
-  /dashboard/page.tsx
-  /layout.tsx
-  /page.tsx
-/components
-  /ui/... (shadcn components)
-  /auth/... (authentication components)
-  /tasks/... (task components)
-/lib
-  /supabase.ts (Supabase client)
-  /utils.ts (utility functions)
-/contexts
-  /AuthContext.tsx
-  /TaskContext.tsx
+/src
+  /app
+    /dashboard
+      page.tsx
+    /sign-in
+      page.tsx
+    /sign-up
+      page.tsx
+    layout.tsx
+    page.tsx
+  /components
+    /ui/... (shadcn components)
+    /auth/... (authentication components)
+    /tasks/... (task components)
+    /layout/... (layout components)
+    ClientProviders.tsx
+  /lib
+    /db.ts (database utilities)
+    /supabase.ts (Supabase client)
+    /types.ts (TypeScript types)
+    /utils.ts (utility functions)
+  /contexts
+    /AuthContext.tsx
+    /TaskContext.tsx
 /prisma
   schema.prisma
 /public
@@ -174,7 +182,7 @@ Using Supabase client library:
 - Task categories/labels
 - Recurring tasks
 - Task sharing or collaboration
-- Dark/light theme
+- Dark/light theme (already partially implemented)
 - Task analytics
 - Progressive Web App (PWA) features
 - Offline support

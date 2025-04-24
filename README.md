@@ -15,6 +15,8 @@ A modern Todo List application that allows users to create, read, update, and de
 - Data Fetching: TanStack Query (React Query)
 - Form Handling: React Hook Form with Zod validation
 
+**Live Demo:** [https://todo-rp8w8ods4-smz-exes-projects.vercel.app](https://todo-rp8w8ods4-smz-exes-projects.vercel.app)
+
 [Go to Todo App](/todo-app)
 
 ## Documentation

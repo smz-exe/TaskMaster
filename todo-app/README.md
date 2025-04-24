@@ -131,6 +131,10 @@ This application can be easily deployed on Vercel:
 3. Add the environment variables to your Vercel project
 4. Deploy
 
+### Live Demo
+
+The application is deployed and available at: [https://todo-rp8w8ods4-smz-exes-projects.vercel.app](https://todo-rp8w8ods4-smz-exes-projects.vercel.app)
+
 ## Future Enhancements
 
 - Task categories/labels

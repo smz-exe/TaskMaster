@@ -1,0 +1,5 @@
+{
+    "rootDirectory": "todo-app",
+    "buildCommand": "cd todo-app && npm run build",
+    "outputDirectory": "todo-app/.next"
+}

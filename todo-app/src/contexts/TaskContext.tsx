@@ -58,13 +58,24 @@ export function TaskProvider({ children }: { children: ReactNode }) {
         const { data, error } = await supabase
             .from("tasks")
             .select("*")
-            .eq("userId", user.id);
+            .eq("user_id", user.id);
 
         if (error) {
             throw new Error(error.message);
         }
 
-        return data as Task[];
+        // Transform snake_case DB fields to camelCase for frontend
+        return (data || []).map((task) => ({
+            id: task.id,
+            userId: task.user_id,
+            title: task.title,
+            description: task.description,
+            isCompleted: task.is_completed,
+            priority: task.priority,
+            dueDate: task.due_date ? new Date(task.due_date) : null,
+            createdAt: new Date(task.created_at),
+            updatedAt: new Date(task.updated_at),
+        })) as Task[];
     }, [user]);
 
     const { data: tasks = [], isLoading } = useQuery({
@@ -78,14 +89,14 @@ export function TaskProvider({ children }: { children: ReactNode }) {
             if (!user) throw new Error("User not authenticated");
 
             const taskToInsert = {
-                userId: user.id,
+                user_id: user.id,
                 title: newTask.title,
                 description: newTask.description || null,
                 priority: newTask.priority || "medium",
-                dueDate: newTask.dueDate
+                due_date: newTask.dueDate
                     ? new Date(newTask.dueDate).toISOString()
                     : null,
-                isCompleted: false,
+                is_completed: false,
             };
 
             const { data, error } = await supabase
@@ -98,7 +109,22 @@ export function TaskProvider({ children }: { children: ReactNode }) {
                 throw new Error(error.message);
             }
 
-            return data as Task;
+            // Transform the response from snake_case to camelCase
+            const task = data
+                ? {
+                      id: data.id,
+                      userId: data.user_id,
+                      title: data.title,
+                      description: data.description,
+                      isCompleted: data.is_completed,
+                      priority: data.priority,
+                      dueDate: data.due_date ? new Date(data.due_date) : null,
+                      createdAt: new Date(data.created_at),
+                      updatedAt: new Date(data.updated_at),
+                  }
+                : null;
+
+            return task as Task;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["tasks", user?.id] });
@@ -119,16 +145,31 @@ export function TaskProvider({ children }: { children: ReactNode }) {
         }) => {
             if (!user) throw new Error("User not authenticated");
 
+            const updateData: Partial<
+                UpdateTaskInput & {
+                    due_date?: string | null;
+                    is_completed?: boolean;
+                }
+            > = { ...data };
+
+            // Convert camelCase fields to snake_case for the database
+            if (data.dueDate !== undefined) {
+                updateData.due_date = data.dueDate
+                    ? new Date(data.dueDate).toISOString()
+                    : null;
+                delete updateData.dueDate;
+            }
+
+            if (data.isCompleted !== undefined) {
+                updateData.is_completed = data.isCompleted;
+                delete updateData.isCompleted;
+            }
+
             const { error } = await supabase
                 .from("tasks")
-                .update({
-                    ...data,
-                    dueDate: data.dueDate
-                        ? new Date(data.dueDate).toISOString()
-                        : undefined,
-                })
+                .update(updateData)
                 .eq("id", id)
-                .eq("userId", user.id);
+                .eq("user_id", user.id);
 
             if (error) {
                 throw new Error(error.message);
@@ -151,7 +192,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
                 .from("tasks")
                 .delete()
                 .eq("id", id)
-                .eq("userId", user.id);
+                .eq("user_id", user.id);
 
             if (error) {
                 throw new Error(error.message);

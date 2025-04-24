@@ -50,6 +50,11 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
+// Helper function to get today's date in YYYY-MM-DD format
+const getTodayDateString = () => {
+    return format(new Date(), "yyyy-MM-dd");
+};
+
 export function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
     const { createTask, updateTask } = useTask();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,29 +66,34 @@ export function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
             title: "",
             description: "",
             priority: "medium" as Priority,
-            dueDate: "",
+            dueDate: getTodayDateString(),
         },
     });
 
+    // Reset form with appropriate values when the dialog opens or task changes
     useEffect(() => {
-        if (task) {
-            form.reset({
-                title: task.title,
-                description: task.description || "",
-                priority: task.priority,
-                dueDate: task.dueDate
-                    ? format(new Date(task.dueDate), "yyyy-MM-dd")
-                    : "",
-            });
-        } else {
-            form.reset({
-                title: "",
-                description: "",
-                priority: "medium",
-                dueDate: "",
-            });
+        if (isOpen) {
+            if (task) {
+                // Editing mode: Fill form with task data
+                form.reset({
+                    title: task.title,
+                    description: task.description || "",
+                    priority: task.priority,
+                    dueDate: task.dueDate
+                        ? format(new Date(task.dueDate), "yyyy-MM-dd")
+                        : "",
+                });
+            } else {
+                // Creation mode: Set default values
+                form.reset({
+                    title: "",
+                    description: "",
+                    priority: "medium",
+                    dueDate: getTodayDateString(),
+                });
+            }
         }
-    }, [task, form]);
+    }, [task, form, isOpen]);
 
     const onSubmit = async (data: FormData) => {
         setIsSubmitting(true);
@@ -118,7 +128,12 @@ export function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+        <Dialog 
+            open={isOpen} 
+            onOpenChange={(open) => {
+                if (!open) onClose();
+            }}
+        >
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>

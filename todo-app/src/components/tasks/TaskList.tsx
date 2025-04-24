@@ -14,6 +14,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Plus, Search, Filter } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function TaskList() {
     const { tasks, isLoading } = useTask();
@@ -47,6 +48,43 @@ export function TaskList() {
             return matchesSearch && matchesStatus && matchesPriority;
         });
     }, [tasks, searchQuery, statusFilter, priorityFilter]);
+
+    // Sort tasks: incomplete tasks first, then by priority (high to low), then by due date
+    const sortedTasks = useMemo(() => {
+        return [...filteredTasks].sort((a, b) => {
+            // First by completion status (incomplete first)
+            if (a.isCompleted !== b.isCompleted) {
+                return a.isCompleted ? 1 : -1;
+            }
+
+            // Then by priority
+            const priorityOrder = { high: 0, medium: 1, low: 2 };
+            if (a.priority !== b.priority) {
+                return (
+                    priorityOrder[a.priority as keyof typeof priorityOrder] -
+                    priorityOrder[b.priority as keyof typeof priorityOrder]
+                );
+            }
+
+            // Then by due date (if available)
+            if (a.dueDate && b.dueDate) {
+                return (
+                    new Date(a.dueDate).getTime() -
+                    new Date(b.dueDate).getTime()
+                );
+            } else if (a.dueDate) {
+                return -1;
+            } else if (b.dueDate) {
+                return 1;
+            }
+
+            // Finally by creation date (newer first)
+            return (
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+            );
+        });
+    }, [filteredTasks]);
 
     const handleEditTask = (task: Task) => {
         setSelectedTask(task);
@@ -133,15 +171,26 @@ export function TaskList() {
                     )}
                 </div>
             ) : (
-                <div className="grid grid-cols-1 gap-4">
-                    {filteredTasks.map((task) => (
-                        <TaskItem
-                            key={task.id}
-                            task={task}
-                            onEdit={handleEditTask}
-                        />
-                    ))}
-                </div>
+                <motion.div layout className="grid grid-cols-1 gap-4">
+                    <AnimatePresence mode="popLayout">
+                        {sortedTasks.map((task) => (
+                            <motion.div
+                                key={task.id}
+                                layout
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{
+                                    duration: 0.3,
+                                    type: "spring",
+                                    stiffness: 500,
+                                    damping: 30,
+                                }}
+                            >
+                                <TaskItem task={task} onEdit={handleEditTask} />
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
+                </motion.div>
             )}
 
             <TaskForm

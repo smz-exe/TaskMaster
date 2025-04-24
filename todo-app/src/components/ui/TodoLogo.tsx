@@ -21,9 +21,10 @@ export function TodoLogo({
             {/* Background glow */}
             <div className="absolute inset-0 bg-primary/10 rounded-full blur-xl"></div>
 
-            {/* Main logo container */}
+            {/* Main logo container - added more padding and made container larger */}
             <motion.div
-                className="relative flex items-center justify-center bg-background border-2 border-primary/20 rounded-xl p-4 shadow-xl"
+                className="relative flex items-center justify-center bg-background border-2 border-primary/20 rounded-xl px-6 py-5 shadow-xl"
+                style={{ minWidth: numericSize * 3 }}
                 initial={animated ? { scale: 0.95, opacity: 0 } : false}
                 animate={animated ? { scale: 1, opacity: 1 } : false}
                 transition={{ type: "spring", duration: 0.6 }}
@@ -44,10 +45,10 @@ export function TodoLogo({
                         />
                     </motion.div>
 
-                    {/* Right side - App name */}
+                    {/* Right side - App name - adjusted font size and added min-width */}
                     <motion.span
-                        className="font-bold text-foreground tracking-tight"
-                        style={{ fontSize: numericSize * 0.5 }}
+                        className="font-bold text-foreground tracking-tight whitespace-nowrap pr-2"
+                        style={{ fontSize: Math.max(numericSize * 0.4, 18) }}
                         initial={animated ? { x: -10, opacity: 0 } : false}
                         animate={animated ? { x: 0, opacity: 1 } : false}
                         transition={{ delay: 0.4, duration: 0.4 }}
@@ -56,16 +57,16 @@ export function TodoLogo({
                     </motion.span>
                 </div>
 
-                {/* Badge with check icon */}
+                {/* Badge with check icon - adjusted positioning to avoid clipping */}
                 <motion.div
-                    className="absolute -top-2 -right-2 bg-background rounded-full p-1 shadow-lg border border-border"
+                    className="absolute -top-3 -right-3 bg-background rounded-full p-1.5 shadow-lg border border-border"
                     initial={animated ? { scale: 0, opacity: 0 } : false}
                     animate={animated ? { scale: 1, opacity: 1 } : false}
                     transition={{ delay: 0.6, type: "spring", stiffness: 200 }}
                 >
                     <div className="rounded-full bg-primary flex items-center justify-center">
                         <Check
-                            size={numericSize * 0.25}
+                            size={numericSize * 0.3}
                             className="text-primary-foreground"
                             strokeWidth={3}
                         />
@@ -73,7 +74,7 @@ export function TodoLogo({
                 </motion.div>
             </motion.div>
 
-            {/* Subtle sparkles around logo */}
+            {/* Subtle sparkles around logo - made zone bigger */}
             {animated && <AnimatedSparkles size={numericSize} />}
         </div>
     );

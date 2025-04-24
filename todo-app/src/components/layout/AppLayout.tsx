@@ -2,7 +2,6 @@
 
 import { ReactNode } from "react";
 import { Navbar } from "./Navbar";
-import { Toaster } from "@/components/ui/sonner";
 
 interface AppLayoutProps {
     children: ReactNode;
@@ -21,7 +20,6 @@ export function AppLayout({ children }: AppLayoutProps) {
                     reserved.
                 </div>
             </footer>
-            <Toaster position="top-right" />
         </div>
     );
 }

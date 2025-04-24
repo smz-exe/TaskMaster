@@ -115,8 +115,7 @@ export function TaskForm({ task, isOpen, onClose, onSuccess }: TaskFormProps) {
                     priority: data.priority as Priority,
                     dueDate: data.dueDate ? new Date(data.dueDate) : null,
                 });
-                // Task creation success toast removed to avoid duplicate notifications
-                // The notification will be handled by the home page component
+                toast.success("Task created successfully");
             }
             onClose();
             // Call the success callback if provided

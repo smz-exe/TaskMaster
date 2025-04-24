@@ -39,6 +39,7 @@ interface TaskFormProps {
     task?: Task | null;
     isOpen: boolean;
     onClose: () => void;
+    onSuccess?: () => void;
 }
 
 const formSchema = z.object({
@@ -55,7 +56,7 @@ const getTodayDateString = () => {
     return format(new Date(), "yyyy-MM-dd");
 };
 
-export function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
+export function TaskForm({ task, isOpen, onClose, onSuccess }: TaskFormProps) {
     const { createTask, updateTask } = useTask();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const isEditing = !!task;
@@ -114,9 +115,14 @@ export function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
                     priority: data.priority as Priority,
                     dueDate: data.dueDate ? new Date(data.dueDate) : null,
                 });
-                toast.success("Task created successfully");
+                // Task creation success toast removed to avoid duplicate notifications
+                // The notification will be handled by the home page component
             }
             onClose();
+            // Call the success callback if provided
+            if (onSuccess) {
+                onSuccess();
+            }
         } catch (error) {
             toast.error(
                 isEditing ? "Failed to update task" : "Failed to create task"
@@ -128,8 +134,8 @@ export function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
     };
 
     return (
-        <Dialog 
-            open={isOpen} 
+        <Dialog
+            open={isOpen}
             onOpenChange={(open) => {
                 if (!open) onClose();
             }}

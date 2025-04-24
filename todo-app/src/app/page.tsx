@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { format } from "date-fns";
 import {
     CheckCircle,
     ListTodo,
@@ -14,8 +17,16 @@ import {
     Timer,
     ArrowUpRight,
     PlusCircle,
+    ArrowRightIcon,
+    CheckIcon,
+    ListTodoIcon,
+    CalendarIcon,
+    BellIcon,
+    UserIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
 import {
     Card,
@@ -23,12 +34,317 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
+    CardDescription,
 } from "@/components/ui/card";
 import { useEffect, useState, useMemo } from "react";
 import { useTask } from "@/contexts/TaskContext";
 import { TaskForm } from "@/components/tasks/TaskForm";
-import { motion, AnimatePresence } from "framer-motion";
-import { format } from "date-fns";
+import { AnimatePresence } from "framer-motion";
+import { TodoLogo } from "@/components/ui/TodoLogo";
+
+// Interfaces for the landing page components
+interface HeroAction {
+    text: string;
+    href: string;
+    icon?: React.ReactNode;
+    variant?: "default" | "outline";
+}
+
+interface HeroProps {
+    badge?: {
+        text: string;
+        action?: {
+            text: string;
+            href: string;
+        };
+    };
+    title: string;
+    description: string;
+    actions: HeroAction[];
+    image?: string;
+}
+
+interface FeatureProps {
+    icon: React.ReactNode;
+    title: string;
+    description: string;
+}
+
+interface Testimonial {
+    id: number | string;
+    name: string;
+    avatar: string;
+    description: string;
+}
+
+// Landing page components
+function HeroSection({ badge, title, description, actions }: HeroProps) {
+    return (
+        <section className="bg-background text-foreground py-16 md:py-24 px-4">
+            <div className="mx-auto max-w-6xl flex flex-col md:flex-row items-center gap-12">
+                <div className="flex flex-col gap-6 md:w-1/2">
+                    {badge && (
+                        <Badge variant="outline" className="w-fit gap-2">
+                            <span className="text-muted-foreground">
+                                {badge.text}
+                            </span>
+                            {badge.action && (
+                                <a
+                                    href={badge.action.href}
+                                    className="flex items-center gap-1"
+                                >
+                                    {badge.action.text}
+                                    <ArrowRightIcon className="h-3 w-3" />
+                                </a>
+                            )}
+                        </Badge>
+                    )}
+
+                    <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
+                        {title}
+                    </h1>
+
+                    <p className="text-lg text-muted-foreground max-w-[550px]">
+                        {description}
+                    </p>
+
+                    <div className="flex flex-col sm:flex-row gap-4 mt-2">
+                        {actions.map((action, index) => (
+                            <Button
+                                key={index}
+                                variant={action.variant}
+                                size="lg"
+                                asChild
+                            >
+                                <Link
+                                    href={action.href}
+                                    className="flex items-center gap-2"
+                                >
+                                    {action.icon}
+                                    {action.text}
+                                </Link>
+                            </Button>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="md:w-1/2">
+                    <div className="relative">
+                        <div className="w-full h-full rounded-xl overflow-hidden border border-border p-8 bg-gradient-to-b from-background to-accent/5 backdrop-blur-sm">
+                            <div className="flex flex-col items-center">
+                                {/* Logo with shadow and glow effect */}
+                                <div className="relative mb-8">
+                                    <div className="absolute -inset-4 bg-primary/5 rounded-full blur-xl"></div>
+                                    <TodoLogo
+                                        size={150}
+                                        className="relative z-10"
+                                    />
+                                </div>
+
+                                {/* App UI mockup */}
+                                <motion.div
+                                    className="relative w-full max-w-md mt-6"
+                                    initial={{ y: 20, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ delay: 0.4, duration: 0.6 }}
+                                >
+                                    <div className="rounded-lg border border-border bg-card p-4 shadow-lg">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <div className="h-4 w-24 bg-primary/20 rounded"></div>
+                                            <div className="h-6 w-6 rounded-full bg-primary/20"></div>
+                                        </div>
+                                        {[1, 2, 3].map((i) => (
+                                            <motion.div
+                                                key={i}
+                                                className="flex items-center gap-3 py-3 border-b border-border"
+                                                initial={{ x: -10, opacity: 0 }}
+                                                animate={{ x: 0, opacity: 1 }}
+                                                transition={{
+                                                    delay: 0.5 + i * 0.1,
+                                                    duration: 0.4,
+                                                }}
+                                            >
+                                                <div className="h-4 w-4 rounded bg-primary/30"></div>
+                                                <div className="h-4 flex-1 bg-primary/10 rounded"></div>
+                                            </motion.div>
+                                        ))}
+                                        <div className="flex justify-between mt-4">
+                                            <div className="h-8 w-20 rounded bg-primary/20"></div>
+                                            <div className="h-8 w-8 rounded-full bg-primary"></div>
+                                        </div>
+                                    </div>
+
+                                    {/* Desktop app window frame effect */}
+                                    <div className="absolute -bottom-3 -left-3 -right-3 h-4 bg-background/80 rounded-b-lg border-x border-b border-border shadow-md"></div>
+                                </motion.div>
+                            </div>
+                        </div>
+                        <AnimatedSparkles />
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+}
+
+function FeaturesSection({ features }: { features: FeatureProps[] }) {
+    return (
+        <section className="bg-background py-16 md:py-24 px-4">
+            <div className="mx-auto max-w-6xl">
+                <div className="text-center mb-16">
+                    <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
+                        Powerful Features
+                    </h2>
+                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                        Everything you need to stay organized and boost your
+                        productivity
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {features.map((feature, index) => (
+                        <Card
+                            key={index}
+                            className="border border-border bg-background"
+                        >
+                            <CardHeader>
+                                <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                                    {feature.icon}
+                                </div>
+                                <CardTitle>{feature.title}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <CardDescription>
+                                    {feature.description}
+                                </CardDescription>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+}
+
+function TestimonialSection({ testimonials }: { testimonials: Testimonial[] }) {
+    return (
+        <section className="bg-accent/5 py-16 md:py-24 px-4">
+            <div className="mx-auto max-w-6xl">
+                <div className="text-center mb-16">
+                    <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
+                        What Our Users Say
+                    </h2>
+                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                        Join thousands of satisfied users who have transformed
+                        their productivity
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {testimonials.map((testimonial) => (
+                        <Card
+                            key={testimonial.id}
+                            className="border border-border bg-background"
+                        >
+                            <CardHeader className="flex flex-row items-center gap-4">
+                                <div className="h-12 w-12 rounded-full overflow-hidden relative">
+                                    <Image
+                                        src={testimonial.avatar}
+                                        alt={testimonial.name}
+                                        width={48}
+                                        height={48}
+                                        className="object-cover"
+                                    />
+                                </div>
+                                <div>
+                                    <CardTitle className="text-lg">
+                                        {testimonial.name}
+                                    </CardTitle>
+                                </div>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-muted-foreground">
+                                    {testimonial.description}
+                                </p>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+}
+
+function CTASection() {
+    return (
+        <section className="bg-background py-16 md:py-24 px-4">
+            <div className="mx-auto max-w-4xl">
+                <Card className="border border-border bg-background">
+                    <CardHeader className="text-center">
+                        <CardTitle className="text-3xl font-bold">
+                            Ready to Get Started?
+                        </CardTitle>
+                        <CardDescription className="text-lg">
+                            Join thousands of users who have transformed their
+                            productivity with our todo app
+                        </CardDescription>
+                    </CardHeader>
+                    <CardFooter className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <Button size="lg" asChild>
+                            <Link href="/sign-up">Sign Up</Link>
+                        </Button>
+                        <Button variant="outline" size="lg" asChild>
+                            <Link href="/sign-in">Sign In</Link>
+                        </Button>
+                    </CardFooter>
+                </Card>
+            </div>
+        </section>
+    );
+}
+
+const AnimatedSparkles = () => (
+    <div className="absolute inset-0 pointer-events-none">
+        <Sparkles />
+    </div>
+);
+
+const Sparkles = () => {
+    const randomMove = () => Math.random() * 2 - 1;
+    const randomOpacity = () => Math.random();
+    const random = () => Math.random();
+
+    return (
+        <div className="absolute inset-0">
+            {[...Array(12)].map((_, i) => (
+                <motion.span
+                    key={`star-${i}`}
+                    animate={{
+                        top: `calc(${random() * 100}% + ${randomMove()}px)`,
+                        left: `calc(${random() * 100}% + ${randomMove()}px)`,
+                        opacity: randomOpacity(),
+                        scale: [1, 1.2, 0],
+                    }}
+                    transition={{
+                        duration: random() * 2 + 4,
+                        repeat: Infinity,
+                        ease: "linear",
+                    }}
+                    style={{
+                        position: "absolute",
+                        top: `${random() * 100}%`,
+                        left: `${random() * 100}%`,
+                        width: `2px`,
+                        height: `2px`,
+                        borderRadius: "50%",
+                        zIndex: 1,
+                    }}
+                    className="inline-block bg-primary"
+                />
+            ))}
+        </div>
+    );
+};
 
 export default function Home() {
     const { user, isLoading: authLoading } = useAuth();
@@ -417,72 +733,109 @@ export default function Home() {
         );
     }
 
-    // Home page for non-authenticated users (original content)
+    // Define features for non-authenticated landing page
+    const features = [
+        {
+            icon: <ListTodoIcon className="h-6 w-6 text-primary" />,
+            title: "Task Management",
+            description:
+                "Create, organize, and prioritize your tasks with ease. Stay on top of your to-dos with our intuitive interface.",
+        },
+        {
+            icon: <CalendarIcon className="h-6 w-6 text-primary" />,
+            title: "Smart Scheduling",
+            description:
+                "Plan your day efficiently with our intelligent scheduling system. Never miss a deadline again.",
+        },
+        {
+            icon: <BellIcon className="h-6 w-6 text-primary" />,
+            title: "Reminders & Notifications",
+            description:
+                "Get timely reminders for important tasks. Stay informed with customizable notifications.",
+        },
+        {
+            icon: <CheckIcon className="h-6 w-6 text-primary" />,
+            title: "Progress Tracking",
+            description:
+                "Monitor your productivity with visual progress indicators. Celebrate your accomplishments.",
+        },
+        {
+            icon: <UserIcon className="h-6 w-6 text-primary" />,
+            title: "Personalization",
+            description:
+                "Customize your workspace to match your workflow. Make the app work for you, not the other way around.",
+        },
+        {
+            icon: <ArrowRightIcon className="h-6 w-6 text-primary" />,
+            title: "Cross-Platform Sync",
+            description:
+                "Access your tasks from anywhere. Seamlessly sync across all your devices in real-time.",
+        },
+    ];
+
+    const testimonials = [
+        {
+            id: 1,
+            name: "Sarah Johnson",
+            avatar: "https://randomuser.me/api/portraits/women/1.jpg",
+            description:
+                "This todo app has completely transformed how I manage my daily tasks. The clean interface makes it a joy to use every day.",
+        },
+        {
+            id: 2,
+            name: "Michael Chen",
+            avatar: "https://randomuser.me/api/portraits/men/2.jpg",
+            description:
+                "As a busy professional, I needed something simple yet powerful. This app delivers exactly that - it's been a game-changer for my productivity.",
+        },
+        {
+            id: 3,
+            name: "Emily Rodriguez",
+            avatar: "https://randomuser.me/api/portraits/women/3.jpg",
+            description:
+                "The reminder features are perfect! I never miss important deadlines anymore. Highly recommend to anyone looking to get organized.",
+        },
+    ];
+
+    // Home page for non-authenticated users (NEW MODERN DESIGN)
     return (
-        <div className="flex flex-col items-center justify-center py-12 md:py-24">
-            <div className="text-center space-y-6 max-w-3xl px-4">
-                <div className="flex justify-center">
-                    <CheckCircle className="h-16 w-16 text-primary" />
-                </div>
+        <div className="min-h-screen bg-background">
+            <HeroSection
+                badge={{
+                    text: "New Release",
+                    action: {
+                        text: "Learn more",
+                        href: "#features",
+                    },
+                }}
+                title="Organize your life with our Todo App"
+                description="A sleek, modern task management solution designed to help you stay organized and boost your productivity."
+                actions={[
+                    {
+                        text: "Sign Up",
+                        href: "/sign-up",
+                        variant: "default",
+                    },
+                    {
+                        text: "Sign In",
+                        href: "/sign-in",
+                        variant: "outline",
+                    },
+                ]}
+                image="/file.svg"
+            />
 
-                <h1 className="text-4xl md:text-6xl font-bold">
-                    Manage Your Tasks with Ease
-                </h1>
+            <Separator className="max-w-6xl mx-auto" />
 
-                <p className="text-xl text-gray-600 dark:text-gray-400 mt-6">
-                    A simple, clean and efficient way to organize your daily
-                    tasks, prioritize your work, and track your progress.
-                </p>
+            <FeaturesSection features={features} />
 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-                    <Link href="/sign-up" passHref>
-                        <Button size="lg" className="text-lg px-8">
-                            Get Started
-                        </Button>
-                    </Link>
-                    <Link href="/sign-in" passHref>
-                        <Button
-                            variant="outline"
-                            size="lg"
-                            className="text-lg px-8"
-                        >
-                            Sign In
-                        </Button>
-                    </Link>
-                </div>
+            <Separator className="max-w-6xl mx-auto" />
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 text-left">
-                    <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border">
-                        <h3 className="text-xl font-semibold mb-2">
-                            Stay Organized
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-400">
-                            Create, organize, and prioritize your tasks to make
-                            sure nothing falls through the cracks.
-                        </p>
-                    </div>
+            <TestimonialSection testimonials={testimonials} />
 
-                    <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border">
-                        <h3 className="text-xl font-semibold mb-2">
-                            Track Progress
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-400">
-                            Mark tasks as complete and keep track of your daily
-                            achievements and pending work.
-                        </p>
-                    </div>
+            <Separator className="max-w-6xl mx-auto" />
 
-                    <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border">
-                        <h3 className="text-xl font-semibold mb-2">
-                            Set Priorities
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-400">
-                            Assign priority levels to your tasks and focus on
-                            what matters most to you.
-                        </p>
-                    </div>
-                </div>
-            </div>
+            <CTASection />
         </div>
     );
 }

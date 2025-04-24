@@ -29,7 +29,12 @@
                 "ms-vscode.vscode-typescript-next"
             ]
         }
-    }
+    },
+
+    // マウント設定を追加。ローカルのフォルダとコンテナ内のワークスペースをマウント
+    "mounts": [
+        "source=${localWorkspaceFolder},target=/workspaces/typescript-node,type=bind,consistency=cached"
+    ]
 
     // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
     // "remoteUser": "root"

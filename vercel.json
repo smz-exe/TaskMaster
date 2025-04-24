@@ -1,5 +1,7 @@
 {
-    "rootDirectory": "todo-app",
+    "$schema": "https://openapi.vercel.sh/vercel.json",
     "buildCommand": "cd todo-app && npm run build",
-    "outputDirectory": "todo-app/.next"
+    "outputDirectory": "todo-app/.next",
+    "framework": "nextjs",
+    "devCommand": "cd todo-app && npm run dev"
 }

@@ -1,5 +1,15 @@
 {
     "chat.tools.autoApprove": true,
     "github.copilot.chat.codeGeneration.useInstructionFiles": true,
-    "chat.agent.maxRequests": 40
+    "chat.agent.maxRequests": 40,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "always"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "editor.formatOnSave": false
 }
